@@ -150,6 +150,8 @@ def enhanced_chunk_docx(file_content, chunk_size=800):
                 current_context['topic'] = 'DELIVERY_DATE'
             elif 'ORDER LIMIT' in text_upper:
                 current_context['topic'] = 'ORDER_LIMIT'
+    except Exception as e:
+        st.error(f"Error initializing session state: {e}")
 # Simple credentials loading
 
 
@@ -162,7 +164,6 @@ if 'vector_db_ready' not in st.session_state:
     st.session_state.vector_db_ready = False
 if 'messages' not in st.session_state:
     st.session_state.messages = []
-# Try to load existing processed data on app start
 if 'data_loaded' not in st.session_state:
     st.session_state.data_loaded = False
 
