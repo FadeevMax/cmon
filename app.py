@@ -382,8 +382,8 @@ def enhanced_chunk_docx(file_content, chunk_size=800):
                     image_path = os.path.join(st.session_state.temp_image_dir, image_filename)
                     
                     image_data = image_part.blob
-                      st.session_state.stored_images[image_filename] = image_data
-                      image_path = image_filename  # Just use filename as reference
+                    st.session_state.stored_images[image_filename] = image_data
+                    image_path = image_filename  # Just use filename as reference
                     
                     images.append({
                         'filename': image_filename,
