@@ -1,1 +1,4 @@
 python-docx
+openai
+requests
+pillow
