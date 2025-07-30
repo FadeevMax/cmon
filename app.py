@@ -910,20 +910,20 @@ with tab1:
 with tab2:
     st.markdown('<div class="step-header">Step 2: Search and Chat</div>', unsafe_allow_html=True)
     if not st.session_state.processing_complete:
-    col1, col2 = st.columns([3, 1])
-    with col2:
-        if st.button("🔄 Reload Data"):
-            with st.spinner("Loading data from GitHub..."):
-                if check_processed_data_exists():
-                    chunks = load_chunks_from_github()
-                    if chunks:
-                        st.session_state.chunks = chunks
-                        st.session_state.processing_complete = True
-                        st.session_state.vector_db_ready = True
-                        st.success("✅ Data loaded successfully!")
-                        st.rerun()
-                else:
-                    st.error("No processed data found. Please process a document first.")
+        col1, col2 = st.columns([3, 1])
+        with col2:
+            if st.button("🔄 Reload Data"):
+                with st.spinner("Loading data from GitHub..."):
+                    if check_processed_data_exists():
+                        chunks = load_chunks_from_github()
+                        if chunks:
+                            st.session_state.chunks = chunks
+                            st.session_state.processing_complete = True
+                            st.session_state.vector_db_ready = True
+                            st.success("✅ Data loaded successfully!")
+                            st.rerun()
+                    else:
+                        st.error("No processed data found. Please process a document first.")
     if not st.session_state.processing_complete:
         st.markdown('<div class="status-box warning">⚠️ Please process a document first in the "Process Document" tab.</div>', unsafe_allow_html=True)
     else:
