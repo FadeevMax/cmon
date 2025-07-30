@@ -842,7 +842,15 @@ with st.sidebar:
         st.info("ℹ️ Upload document to enable search")
 
 # Main interface with tabs
-tab1, tab2, tab3 = st.tabs(["📄 Process Document", "🔍 Search & Chat", "📋 View Chunks"])
+# Default tab control
+if 'active_tab' not in st.session_state:
+    st.session_state.active_tab = "chat"  # default to chat tab
+
+tab_labels = ["📄 Process Document", "🔍 Search & Chat", "📋 View Chunks"]
+tab1, tab2, tab3 = st.tabs(tab_labels)
+
+# Activate correct tab
+tab_index = tab_labels.index("🔍 Search & Chat") if st.session_state.active_tab == "chat" else 0
 
 # Tab 1: Document Processing
 with tab1:
@@ -907,7 +915,24 @@ with tab1:
 # Tab 2: Search and Chat
 with tab2:
     st.markdown('<div class="step-header">Step 2: Search and Chat</div>', unsafe_allow_html=True)
-    
+    with st.container():
+    col_a, col_b = st.columns([6, 1])  # Right-aligned button
+    with col_b:
+        if st.button("☁️ Fetch & Process", help="Download latest SOP from GitHub and process it"):
+            with st.spinner("Downloading and processing document..."):
+                file_content = get_docx_from_github()
+                if file_content:
+                    chunks = enhanced_chunk_docx(file_content, chunk_size=800)  # or dynamic chunk size
+                    if chunks:
+                        st.session_state.docx_from_github = file_content
+                        st.session_state.chunks = chunks
+                        st.session_state.processing_complete = True
+                        st.session_state.vector_db_ready = True
+                        st.success("✅ SOP downloaded and processed!")
+                    else:
+                        st.error("❌ Processing failed. Check file content.")
+                else:
+                    st.error("❌ Could not fetch document from GitHub.")
     if not st.session_state.processing_complete:
         st.markdown('<div class="status-box warning">⚠️ Please process a document first in the "Process Document" tab.</div>', unsafe_allow_html=True)
     else:
