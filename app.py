@@ -15,71 +15,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
-# Simple credentials loading
-def load_api_keys():
-    """Load API keys from environment variables only"""
-    openai_key = os.getenv('OPENAI_API_KEY', '')
-    gemini_key = os.getenv('GEMINI_API_KEY', '')
-    return openai_key, gemini_key
-
-# Initialize session state
-if 'processing_complete' not in st.session_state:
-    st.session_state.processing_complete = False
-if 'chunks' not in st.session_state:
-    st.session_state.chunks = []
-if 'vector_db_ready' not in st.session_state:
-    st.session_state.vector_db_ready = False
-if 'messages' not in st.session_state:
-    st.session_state.messages = []
-# Try to load existing processed data on app start
-if 'data_loaded' not in st.session_state:
-    st.session_state.data_loaded = False
-
-if not st.session_state.data_loaded and not st.session_state.processing_complete:
-    with st.spinner("Loading existing data..."):
-        if check_processed_data_exists():
-            chunks = load_chunks_from_github()
-            if chunks:
-                st.session_state.chunks = chunks
-                st.session_state.processing_complete = True
-                st.session_state.vector_db_ready = True
-                st.session_state.data_loaded = True
-                st.success("✅ Loaded existing processed data!")
-
-# CSS
-st.markdown("""
-<style>
-.main-header { 
-    font-size: 2.5rem; 
-    font-weight: bold; 
-    background: linear-gradient(90deg, #1e3c72, #2a5298);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-align: center;
-    margin-bottom: 2rem;
-}
-.step-header {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #1e3c72;
-    margin: 1rem 0;
-}
-.status-box {
-    padding: 1rem;
-    border-radius: 8px;
-    margin: 1rem 0;
-}
-.success { background: #d4edda; border-left: 4px solid #28a745; }
-.warning { background: #fff3cd; border-left: 4px solid #ffc107; }
-.info { background: #d1ecf1; border-left: 4px solid #17a2b8; }
-</style>
-""", unsafe_allow_html=True)
-
-# Header
-st.markdown('<h1 class="main-header">🚀 GTI SOP Assistant - Unified</h1>', unsafe_allow_html=True)
-st.markdown("*All-in-one: Document Processing + Vector DB + Chat Interface*")
-
 def save_chunks_to_github(chunks):
     """Save processed chunks to GitHub as JSON"""
     import json
@@ -209,6 +144,71 @@ def enhanced_chunk_docx(file_content, chunk_size=800):
                 current_context['topic'] = 'DELIVERY_DATE'
             elif 'ORDER LIMIT' in text_upper:
                 current_context['topic'] = 'ORDER_LIMIT'
+# Simple credentials loading
+def load_api_keys():
+    """Load API keys from environment variables only"""
+    openai_key = os.getenv('OPENAI_API_KEY', '')
+    gemini_key = os.getenv('GEMINI_API_KEY', '')
+    return openai_key, gemini_key
+
+# Initialize session state
+if 'processing_complete' not in st.session_state:
+    st.session_state.processing_complete = False
+if 'chunks' not in st.session_state:
+    st.session_state.chunks = []
+if 'vector_db_ready' not in st.session_state:
+    st.session_state.vector_db_ready = False
+if 'messages' not in st.session_state:
+    st.session_state.messages = []
+# Try to load existing processed data on app start
+if 'data_loaded' not in st.session_state:
+    st.session_state.data_loaded = False
+
+if not st.session_state.data_loaded and not st.session_state.processing_complete:
+    with st.spinner("Loading existing data..."):
+        if check_processed_data_exists():
+            chunks = load_chunks_from_github()
+            if chunks:
+                st.session_state.chunks = chunks
+                st.session_state.processing_complete = True
+                st.session_state.vector_db_ready = True
+                st.session_state.data_loaded = True
+                st.success("✅ Loaded existing processed data!")
+
+# CSS
+st.markdown("""
+<style>
+.main-header { 
+    font-size: 2.5rem; 
+    font-weight: bold; 
+    background: linear-gradient(90deg, #1e3c72, #2a5298);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.step-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1e3c72;
+    margin: 1rem 0;
+}
+.status-box {
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+.success { background: #d4edda; border-left: 4px solid #28a745; }
+.warning { background: #fff3cd; border-left: 4px solid #ffc107; }
+.info { background: #d1ecf1; border-left: 4px solid #17a2b8; }
+</style>
+""", unsafe_allow_html=True)
+
+# Header
+st.markdown('<h1 class="main-header">🚀 GTI SOP Assistant - Unified</h1>', unsafe_allow_html=True)
+st.markdown("*All-in-one: Document Processing + Vector DB + Chat Interface*")
+
+
         
         # Enhanced caption pattern matching (based on your code)
         def clean_caption(text):
