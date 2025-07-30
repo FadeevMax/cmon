@@ -15,6 +15,12 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+def load_api_keys():
+    """Load API keys from environment variables only"""
+    openai_key = os.getenv('OPENAI_API_KEY', '')
+    gemini_key = os.getenv('GEMINI_API_KEY', '')
+    return openai_key, gemini_key
 def save_chunks_to_github(chunks):
     """Save processed chunks to GitHub as JSON"""
     import json
@@ -145,11 +151,7 @@ def enhanced_chunk_docx(file_content, chunk_size=800):
             elif 'ORDER LIMIT' in text_upper:
                 current_context['topic'] = 'ORDER_LIMIT'
 # Simple credentials loading
-def load_api_keys():
-    """Load API keys from environment variables only"""
-    openai_key = os.getenv('OPENAI_API_KEY', '')
-    gemini_key = os.getenv('GEMINI_API_KEY', '')
-    return openai_key, gemini_key
+
 
 # Initialize session state
 if 'processing_complete' not in st.session_state:
