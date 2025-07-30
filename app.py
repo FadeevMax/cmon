@@ -916,23 +916,23 @@ with tab1:
 with tab2:
     st.markdown('<div class="step-header">Step 2: Search and Chat</div>', unsafe_allow_html=True)
     with st.container():
-    col_a, col_b = st.columns([6, 1])  # Right-aligned button
-    with col_b:
-        if st.button("☁️ Fetch & Process", help="Download latest SOP from GitHub and process it"):
-            with st.spinner("Downloading and processing document..."):
-                file_content = get_docx_from_github()
-                if file_content:
-                    chunks = enhanced_chunk_docx(file_content, chunk_size=800)  # or dynamic chunk size
-                    if chunks:
-                        st.session_state.docx_from_github = file_content
-                        st.session_state.chunks = chunks
-                        st.session_state.processing_complete = True
-                        st.session_state.vector_db_ready = True
-                        st.success("✅ SOP downloaded and processed!")
+        col_a, col_b = st.columns([6, 1])  # Right-aligned button
+        with col_b:
+            if st.button("☁️ Fetch & Process", help="Download latest SOP from GitHub and process it"):
+                with st.spinner("Downloading and processing document..."):
+                    file_content = get_docx_from_github()
+                    if file_content:
+                        chunks = enhanced_chunk_docx(file_content, chunk_size=800)  # or dynamic chunk size
+                        if chunks:
+                            st.session_state.docx_from_github = file_content
+                            st.session_state.chunks = chunks
+                            st.session_state.processing_complete = True
+                            st.session_state.vector_db_ready = True
+                            st.success("✅ SOP downloaded and processed!")
+                        else:
+                            st.error("❌ Processing failed. Check file content.")
                     else:
-                        st.error("❌ Processing failed. Check file content.")
-                else:
-                    st.error("❌ Could not fetch document from GitHub.")
+                        st.error("❌ Could not fetch document from GitHub.")
     if not st.session_state.processing_complete:
         st.markdown('<div class="status-box warning">⚠️ Please process a document first in the "Process Document" tab.</div>', unsafe_allow_html=True)
     else:
