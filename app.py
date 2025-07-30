@@ -63,6 +63,24 @@ def upload_to_github(filename, content, folder="images"):
     else:
         return None
 
+def get_docx_from_github(repo="FadeevMax/cmon", path="GTI_Data_Base_and_SOP.docx", branch="main"):
+    import requests
+
+    token = os.getenv("GITHUB_TOKEN", "")
+    headers = {"Authorization": f"Bearer {token}"} if token else {}
+
+    url = f"https://raw.githubusercontent.com/{repo}/{branch}/{path}"
+
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.content
+        else:
+            st.error(f"Failed to fetch DOCX: {response.status_code} - {response.text}")
+    except Exception as e:
+        st.error(f"Error fetching DOCX: {str(e)}")
+    return None
+    
 def get_from_github(filename, folder="images"):
     """Get file from GitHub"""
     import requests
@@ -830,11 +848,16 @@ tab1, tab2, tab3 = st.tabs(["📄 Process Document", "🔍 Search & Chat", "📋
 with tab1:
     st.markdown('<div class="step-header">Step 1: Upload and Process Document</div>', unsafe_allow_html=True)
     
-    uploaded_file = st.file_uploader(
-        "Upload your DOCX file",
-        type=['docx'],
-        help="Upload the GTI SOP document for processing"
-    )
+    docx_source = st.radio("Choose document source:", ["📁 Upload", "☁️ Load from GitHub"])
+    
+    if docx_source == "📁 Upload":
+        uploaded_file = st.file_uploader("Upload your DOCX file", type=["docx"])
+    else:
+        if st.button("☁️ Fetch from GitHub"):
+            file_content = get_docx_from_github()
+            if file_content:
+                st.session_state.docx_from_github = file_content
+                st.success("✅ File downloaded from GitHub!")
     
     col1, col2 = st.columns([1, 1])
     
@@ -842,40 +865,44 @@ with tab1:
         chunk_size = st.number_input("Chunk Size (characters)", 500, 2000, 800)
     
     with col2:
-        if st.button("🚀 Process Document", disabled=uploaded_file is None):
-            if uploaded_file is not None:
-                with st.spinner("Processing document..."):
-                    try:
-                        # Read file content
+        if st.button("🚀 Process Document"):
+            with st.spinner("Processing document..."):
+                try:
+                    if docx_source == "📁 Upload" and uploaded_file:
                         file_content = uploaded_file.read()
+                    elif docx_source == "☁️ Load from GitHub" and "docx_from_github" in st.session_state:
+                        file_content = st.session_state.docx_from_github
+                    else:
+                        st.error("❌ Please provide a document.")
+                        st.stop()
                         
                         # Process document with enhanced extraction
-                        chunks = enhanced_chunk_docx(file_content, chunk_size)
+                    chunks = enhanced_chunk_docx(file_content, chunk_size)
+                    
+                    if chunks:
+                        st.session_state.chunks = chunks
+                        st.session_state.processing_complete = True
+                        st.session_state.vector_db_ready = True
                         
-                        if chunks:
-                            st.session_state.chunks = chunks
-                            st.session_state.processing_complete = True
-                            st.session_state.vector_db_ready = True
-                            
-                            # Count chunks with images for debugging
-                            chunks_with_images = sum(1 for c in chunks if c.get('images'))
-                            total_images = sum(len(c.get('images', [])) for c in chunks)
-                            
-                            st.success(f"✅ Document processed successfully! Created {len(chunks)} chunks.")
-                            st.info(f"📸 {chunks_with_images} chunks contain {total_images} total images")
-                            
-                            # Show preview
-                            with st.expander("📖 Preview First Chunk"):
-                                if chunks:
-                                    preview_chunk = chunks[0]
-                                    st.write(f"**Chunk 0:** {preview_chunk['text'][:200]}...")
-                                    st.json(preview_chunk['metadata'])
-                        else:
-                            st.error("❌ Failed to process document. Please check the file format.")
-                            
-                    except Exception as e:
-                        st.error(f"❌ Error processing document: {str(e)}")
-                        st.code(traceback.format_exc())
+                        # Count chunks with images for debugging
+                        chunks_with_images = sum(1 for c in chunks if c.get('images'))
+                        total_images = sum(len(c.get('images', [])) for c in chunks)
+                        
+                        st.success(f"✅ Document processed successfully! Created {len(chunks)} chunks.")
+                        st.info(f"📸 {chunks_with_images} chunks contain {total_images} total images")
+                        
+                        # Show preview
+                        with st.expander("📖 Preview First Chunk"):
+                            if chunks:
+                                preview_chunk = chunks[0]
+                                st.write(f"**Chunk 0:** {preview_chunk['text'][:200]}...")
+                                st.json(preview_chunk['metadata'])
+                    else:
+                        st.error("❌ Failed to process document. Please check the file format.")
+                        
+                except Exception as e:
+                    st.error(f"❌ Error processing document: {str(e)}")
+                    st.code(traceback.format_exc())
 
 # Tab 2: Search and Chat
 with tab2:
