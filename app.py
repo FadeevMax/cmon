@@ -149,7 +149,7 @@ st.markdown('<h1 class="main-header">🚀 GTI SOP Assistant - Unified</h1>', uns
 st.markdown("*All-in-one: Document Processing + Vector DB + Chat Interface*")
 
 # Enhanced document chunker with image extraction
-def enhanced_chunk_docx(file_content, chunk_size=800):
+def enhanced_chunk_docx(file_content, chunk_size=600):
     """Enhanced DOCX chunker with complete content extraction"""
     try:
         from docx import Document
@@ -486,7 +486,7 @@ def enhanced_chunk_docx(file_content, chunk_size=800):
         if all_images:
             st.success(f"✅ Extracted {len(all_images)} images with enhanced labels")
             with st.expander("🖼️ Image Details"):
-                for i, img in enumerate(all_images[:5]):  # Show first 5
+                for i, img in enumerate(all_images[:4]):  # Show first 5
                     st.write(f"**{img['label']}** - Position: {img.get('position', 'N/A')}")
         else:
             st.warning("⚠️ No images found in document")
@@ -591,7 +591,7 @@ def enhanced_chunk_docx(file_content, chunk_size=800):
         return []
 
 # Enhanced search with context awareness
-def enhanced_search(chunks, query, top_k=5):
+def enhanced_search(chunks, query, top_k=3):
     """Enhanced search with context and metadata awareness"""
     import re
     
@@ -870,7 +870,7 @@ with tab1:
     col1, col2 = st.columns([1, 1])
     
     with col1:
-        chunk_size = st.number_input("Chunk Size (characters)", 500, 2000, 800)
+        chunk_size = st.number_input("Chunk Size (characters)", 300, 1500, 600)
     
     with col2:
         if st.button("🚀 Process Document"):
